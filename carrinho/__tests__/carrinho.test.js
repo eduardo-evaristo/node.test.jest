@@ -31,4 +31,54 @@ describe('Testes da classe Carrinho', () => {
     // This one is for objects, it checks for the property existence and optionally its value
     expect(carrinho).toHaveProperty('total', null);
   });
+
+  it('Deve lançar um erro ao finalizar compra com carrinho vazio', () => {
+    // Gotta 'encompass' the error-throwing part of the code inside a function to be tested
+    function englobaFinalizaCompra() {
+      const carrinho = new Carrinho();
+      // This should throw an error
+      carrinho.finalizaCompra();
+    }
+
+    expect(englobaFinalizaCompra).toThrow('Carrinho de compras vazio');
+  });
+
+  it('Deve adicionar um valor de frete ao carrinho', () => {
+    const carrinho = new Carrinho();
+    const valorFrete = 20;
+    carrinho.adicionaFrete(valorFrete);
+
+    expect(carrinho.frete).toBe(valorFrete);
+  });
+
+  // Since this function is called in finalizarCompra, the coverage test'd say this been covered
+  // Even though it had not been tested, that would be a false positive
+  it('Deve calcular o total do carrinho', () => {
+    const item1 = new Item('Beterraba', 10, 4);
+    const item2 = new Item('Feijão', 10, 1);
+
+    const carrinho = new Carrinho();
+    carrinho.adiciona(item1);
+    carrinho.adiciona(item2);
+
+    carrinho.adicionaFrete(20);
+
+    const expected = 70;
+    expect(carrinho.calculaTotal()).toBe(expected);
+  });
+
+  it('Deve finalizar a compra', () => {
+    const item1 = new Item('Beterraba', 10, 4);
+    const item2 = new Item('Feijão', 10, 1);
+
+    const carrinho = new Carrinho();
+    carrinho.adiciona(item1);
+    carrinho.adiciona(item2);
+
+    carrinho.adicionaFrete(20);
+
+    const expectedObject = { subtotal: 50, frete: 20, total: 70 };
+    // If we're expecting an exact object, we should go for toStrictEqual
+    expect(carrinho.finalizaCompra()).toStrictEqual(expectedObject);
+  });
 });
